@@ -27,6 +27,9 @@ class Piece:
         :return: True if the piece white, False otherwise
         """
         return self.white
+    
+    def cell_valid_and_empty(self, cell):
+        return self.board.cell_is_valid_and_empty(cell) # sollte das so ??
 
     def can_enter_cell(self, cell):
         """
@@ -111,7 +114,44 @@ class Pawn(Piece):  # Bauer
         :return: A list of reachable cells this pawn could move into.
         """
         # TODO: Implement a method that returns all cells this piece can enter in its next move
+        reachable_cells_white = []
+        reachable_cells_black = []
+        row , col = self.cell  # (3,4)
+        # WHITE PIECES <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        if self.is_white() == True:
+            #FORWARD ---------------------------------------------
+            forward_moves = [(row - 1 , col)]     
+            if row == 6:                      # Startposition checken
+                forward_moves.append((row - 2 , col)) # add dash 
+            for zelle in forward_moves:            # über mögliche forward moves iterieren und checken ob die möglich sind, wenn ja zur Liste adden
+                if self.cell_valid_and_empty(zelle) == True:
+                    reachable_cells_white.append(zelle)
+            row -= 1                          # das steht hier weil das sonst mit dem Startposition Ding gemessed hätte
+            #DIAGONAL ---------------------------------------------
+            diagonal_hit = [(row, col + 1), (row, col - 1)]
+            for zelle in diagonal_hit:
+                if self.can_hit_on_cell(zelle) == True:
+                    reachable_cells_white.append(zelle)
+        
+            return reachable_cells_white
+        
+        # BLACK PIECES <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        if self.is_white() == False:
+            #FORWARD -------------------------------------------
+            forward_moves = [(row, col)]
+            if row == 1:                    # Startposition checken
+                forward_moves.append((row + 2, col))  # add dash
+            for zelle in forward_moves:
+                if self.cell_valid_and_empty(zelle) == True:
+                    reachable_cells_black.append(zelle)
+            row += 1
+            #DIAGONAL -------------------------------------------
+            diagonal_hit = [(row, col + 1), (row, col - 1)]
+            for zelle in diagonal_hit:
+                if self.can_hit_on_cell(zelle) == True:
+                    reachable_cells_black.append(zelle)
 
+            return reachable_cells_black
 
 class Rook(Piece):  # Turm
     def __init__(self, board, white):
@@ -134,6 +174,52 @@ class Rook(Piece):  # Turm
         :return: A list of reachable cells this rook could move into.
         """
         # TODO: Implement a method that returns all cells this piece can enter in its next move
+        reachable_cells = []
+        row , col = self.cell 
+        #HORIZONTAL MOVES ---------------------------------------------------
+        while True: #rechts --------- 
+            col += 1
+            if self.cell_valid_and_empty((row, col)) == True:  # move until theres a piece blocking the way
+                reachable_cells.append((row, col))
+            else:
+                if self.can_hit_on_cell((row, col)) == True:  # check which color
+                    reachable_cells.append((row, col))        # replace the opposing piece then stop
+                    break 
+                else:
+                    break                                     # stop if its the same color
+        while True: #links -----------
+            col -= 1
+            if self.cell_valid_and_empty((row, col)) == True:
+                reachable_cells.append((row, col))
+            else:
+                if self.can_hit_on_cell((row, col)) == True:
+                    reachable_cells.append((row, col))
+                    break
+                else:
+                    break
+        #VERTIKAL MOVES -----------------------------------------------------
+        while True: #hinten/unten -------------
+            row += 1
+            if self.cell_valid_and_empty((row, col)) == True:
+                reachable_cells.append((row, col))
+            else:
+                if self.can_hit_on_cell((row, col)) == True:
+                    reachable_cells.append((row, col))
+                    break
+                else: 
+                    break
+        while True: #vorne/oben -------------
+            row -= 1
+            if self.cell_valid_and_empty((row, col)) == True:
+                reachable_cells.append((row, col))
+            else: 
+                if self.can_hit_on_cell((row, col)) == True:
+                    reachable_cells.append((row, col))
+                    break 
+                else:
+                    break
+        
+        return reachable_cells
 
 
 class Knight(Piece):  # Springer
@@ -157,7 +243,17 @@ class Knight(Piece):  # Springer
         :return: A list of reachable cells this knight could move into.
         """
         # TODO: Implement a method that returns all cells this piece can enter in its next move
+        reachable_cells = []
+        row, col = self.cell
+        # wir gehen im Uhrzeigersinn 
+        # starting with two straight up and one right, then one up and two right und immer so weiter 
+        every_reachable_cell = [(row - 2, col + 1), (row - 1, col + 2), (row + 1, col + 2), (row + 2, col + 1), (row + 2, col - 1), (row + 1, col -2), (row - 1, col - 2), (row - 2, col - 1)]
+        for zelle in every_reachable_cell:
+            if self.can_enter_cell(zelle) == True:   # cell has to be either valid+empty / valid+opposing piece
+                reachable_cells.append(zelle)
 
+        return reachable_cells
+    
 
 class Bishop(Piece):  # Läufer
     def __init__(self, board, white):
@@ -179,7 +275,59 @@ class Bishop(Piece):  # Läufer
         :return: A list of reachable cells this bishop could move into.
         """
         # TODO: Implement a method that returns all cells this piece can enter in its next move
-
+        # im Uhrzeigersinn
+        reachable_cells = []
+        row, col = self.cell
+        #RECHTSOBEN/VORNE ----------------------------------------
+        while True:
+            col += 1
+            row -= 1
+            if self.cell_valid_and_empty((row, col)) == True:  # move until a piece blocks the way
+                reachable_cells.append((row, col))
+            else:
+                if self.can_hit_on_cell((row, col)) == True:   #check color
+                    reachable_cells.append((row, col))
+                    break
+                else:
+                    break
+        #RECHTSUNTEN/HINTEN ---------------------------------------
+        while True:
+            col += 1
+            row += 1
+            if self.cell_valid_and_empty((row, col)) == True:
+                reachable_cells.append((row, col))
+            else:
+                if self.can_hit_on_cell((row, col)) == True:
+                    reachable_cells.append((row, col))
+                    break
+                else:
+                    break
+        #LINKSUNTEN/HINTEN ----------------------------------------
+        while True:
+            col -= 1
+            row += 1
+            if self.cell_valid_and_empty((row, col)) == True:
+                reachable_cells.append((row, col))
+            else:
+                if self.can_hit_on_cell((row, col)) == True:
+                    reachable_cells.append((row, col))
+                    break
+                else:
+                    break
+        #LINKSOBEN/VORNE ------------------------------------------
+        while True:
+            col -= 1
+            row -= 1
+            if self.cell_valid_and_empty((row, col)) == True:
+                reachable_cells.append((row, col))
+            else:
+                if self.can_hit_on_cell((row, col)) == True:
+                    reachable_cells.append((row, col))
+                    break
+                else:
+                    break
+        
+        return reachable_cells
 
 class Queen(Piece):  # Königin
     def __init__(self, board, white):
@@ -202,7 +350,104 @@ class Queen(Piece):  # Königin
         :return: A list of reachable cells this queen could move into.
         """
         # TODO: Implement a method that returns all cells this piece can enter in its next move
-
+        # im Uhrzeigersinn
+        reachable_cells = []
+        row, col = self.cell
+        #VERTIKAL - STRAIGHT UP -------------------------------------
+        while True:
+            row -= 1
+            if self.cell_valid_and_empty((row, col)) == True:
+                reachable_cells.append((row, col))
+            else:
+                if self.can_hit_on_cell((row, col)) == True:
+                    reachable_cells.append((row, col))
+                    break
+                else:
+                    break
+        #DIAGONAL - RECHTSOBEN -------------------------------------- #das hier geht im test schief MÖP MÖP 
+        while True:
+            row -= 1
+            col += 1
+            if self.cell_valid_and_empty((row, col)) == True:
+                reachable_cells.append((row, col))
+            else:
+                if self.can_hit_on_cell((row, col)) == True:
+                    reachable_cells.append((row, col))
+                    break
+                else:
+                    break
+        #HORIZONTAL - RECHTS ----------------------------------------
+        while True:
+            col += 1
+            if self.cell_valid_and_empty((row, col)) == True:
+                reachable_cells.append((row, col))
+            else: 
+                if self.can_hit_on_cell((row, col)) == True:
+                    reachable_cells.append((row, col))
+                    break
+                else:
+                    break
+        #DIAGONAL - RECHTSUNTEN ---------------------------------------
+        while True:
+            row += 1
+            col += 1
+            if self.cell_valid_and_empty((row, col)) == True:
+                reachable_cells.append((row, col))
+            else:
+                if self.can_hit_on_cell((row, col)) == True:
+                    reachable_cells.append((row, col))
+                    break
+                else:
+                    break
+        #VERTIKAL - STRAIGHT DOWN --------------------------------------
+        while True:
+            row += 1
+            if self.cell_valid_and_empty((row, col)) == True:
+                reachable_cells.append((row, col))
+            else:
+                if self.can_hit_on_cell((row, col)) == True:
+                    reachable_cells.append((row, col))
+                    break
+                else:
+                    break
+        #DIAGONAL - LINKSUNTEN -------------------------------------------
+        while True:
+            row += 1
+            col -= 1
+            if self.cell_valid_and_empty((row, col)) == True:
+                reachable_cells.append((row, col))
+            else:
+                if self.can_hit_on_cell((row, col)) == True:
+                    reachable_cells.append((row, col))
+                    break
+                else:
+                    break
+        #HORIZONTAL - LINKS -------------------------------------------
+        while True:
+            col -= 1
+            if self.cell_valid_and_empty((row, col)) == True:
+                reachable_cells.append((row, col))
+            else:
+                if self.can_hit_on_cell((row, col)) == True:
+                    reachable_cells.append((row, col))
+                    break
+                else:
+                    break
+        #DIAGONAL - LINKSOBEN ----------------------------------------
+        while True:
+            row -= 1
+            col -= 1
+            if self.cell_valid_and_empty((row, col)) == True:
+                reachable_cells.append((row, col))
+            else:
+                if self.can_hit_on_cell((row, col)) == True:
+                    reachable_cells.append((row, col))
+                    break
+                else:
+                    break
+        
+        return reachable_cells
+    # test sagt mir diese Implementierung ist falsch aber das ist doch genauso wie oben...
 
 class King(Piece):  # König
     def __init__(self, board, white):
@@ -224,3 +469,12 @@ class King(Piece):  # König
         :return: A list of reachable cells this king could move into.
         """
         # TODO: Implement a method that returns all cells this piece can enter in its next move
+        # im Uhrzeigersinn
+        reachable_cells = []
+        row, col = self.cell
+        every_reachable_cell = [(row - 1, col), (row - 1, col + 1), (row, col + 1), (row + 1, col + 1), (row + 1, col), (row + 1, col - 1), (row, col - 1), (row - 1, col - 1)]
+        for zelle in every_reachable_cell:
+            if self.can_enter_cell(zelle) == True:
+                reachable_cells.append(zelle)
+        
+        return reachable_cells

@@ -241,6 +241,10 @@ class Board(BoardBase):
         :type white: Boolean
         """
         # TODO: Implement
+        for row in self.cells:   # erstmal in die erste Reihe gehen
+            for cell in row:      # und dann die columns durchgehen
+                if cell is not None and cell.white == white:     # if there is a piece on the cell and has correct color
+                    yield cell                              
 
     def find_king(self, white):
         """
@@ -255,6 +259,10 @@ class Board(BoardBase):
         :return: The :py:class:'King': object of the given color or None if there is no King on the board.
         """
         # TODO: Implement
+        every_piece_of_given_color = self.iterate_cells_with_pieces(white)
+        for piece in every_piece_of_given_color:   # iterate over generator
+            if isinstance(piece, King) == True:    # check for king
+                    return piece                              # wtf no way this was the FUCKING ISSUE ASHFHGAFGHAFHIAF
 
     def is_king_check(self, white):
         """
@@ -267,6 +275,21 @@ class Board(BoardBase):
         Iterate over each reachable cell and check if the kings cell is reachable. If yes, shortcut and return True right away.
         """
         # TODO: Implement
+        king = self.find_king(white)
+        all_pieces_of_opposing_color = self.iterate_cells_with_pieces(not white)
+        for piece in all_pieces_of_opposing_color:
+            reachable_cells = piece.get_reachable_cells()    # ehhh what is going on # self.pieces.get_reachable_cells()
+            for cell in reachable_cells:
+                if cell == king.cell:
+                    return True
+        # hier stimmt irgendwas nicht 
+        #xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        #xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        #xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        #xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        #xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        #xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        #xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
     def evaluate(self):
         """
@@ -293,6 +316,12 @@ class Board(BoardBase):
         Don´t forget to handle the special case of "cell" being None. Return False in that case
         """
         # TODO: Implement
+        if cell is None:
+            return False
+        row, col = cell
+        if 0 <= row <= 7 and  0 <= col <= 7:
+            return True
+        #print(is_valid_cell(None, (4,3)))
 
     def cell_is_valid_and_empty(self, cell):
         """
@@ -303,6 +332,16 @@ class Board(BoardBase):
         If so, use "get_cell()" to retrieve the piece placed on it and return True if there is None
         """
         # TODO: Implement
+        # TODO: Implement
+        if self.is_valid_cell(cell) == True:
+            if self.get_cell(cell) == None:
+                return True
+            else:
+                return False # nur so funktioniert der Test lolski
+                # return self.get_cell(cell) 
+        else: 
+            return False
+        #Noch eine Lösung #return self.is_valid_cell(cell) and self.get_cell(cell) is None
 
     def piece_can_enter_cell(self, piece, cell):
         """
@@ -320,6 +359,18 @@ class Board(BoardBase):
         the given piece "white" attribute.
         """
         # TODO: Implement
+        if self.is_valid_cell(cell) == True:   
+            if self.get_cell(cell) == None:
+                return True 
+            else:
+                other_piece = self.get_cell(cell)
+                if piece.white == other_piece.white:    # wenn die bool Werte gleich sind
+                    return False
+                else:
+                    return True  # color is different
+                
+        else:
+            return False
  
 
     def piece_can_hit_on_cell(self, piece, cell):
@@ -338,3 +389,16 @@ class Board(BoardBase):
         the given piece "white" attribute.
         """
         # TODO: Implement
+         # TODO: Implement
+        if self.is_valid_cell(cell) == True: 
+            if self.get_cell(cell) == None:
+                return False
+            else:
+                other_piece = self.get_cell(cell)
+                if piece.white == other_piece.white: # color is the same
+                    return False
+                else:
+                    return True
+                
+        else:
+            return False
