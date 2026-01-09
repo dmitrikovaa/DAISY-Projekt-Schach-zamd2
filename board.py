@@ -211,7 +211,7 @@ class BoardBase:
         self.set_cell(np.array([0, 4]), King(self, True))
         self.set_cell(np.array([7, 4]), King(self, False))
 
-        #self.save_to_disk()
+        self.save_to_disk()
 
 
 class Board(BoardBase):
@@ -275,21 +275,14 @@ class Board(BoardBase):
         Iterate over each reachable cell and check if the kings cell is reachable. If yes, shortcut and return True right away.
         """
         # TODO: Implement
-        king = self.find_king(white)
-        all_pieces_of_opposing_color = self.iterate_cells_with_pieces(not white)
-        for piece in all_pieces_of_opposing_color:
-            reachable_cells = piece.get_reachable_cells()    # ehhh what is going on # self.pieces.get_reachable_cells()
-            for cell in reachable_cells:
-                if cell == king.cell:
-                    return True
-        # hier stimmt irgendwas nicht 
-        #xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-        #xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-        #xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-        #xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-        #xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-        #xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-        #xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        king = self.find_king(white)    # save king in variable
+        all_pieces_of_opposing_color = self.iterate_cells_with_pieces(not white) # get all pieces of the opposing color
+        for piece in all_pieces_of_opposing_color:    # iterate over them and get every possible move for each piece of the list
+            reachable_cells = piece.get_reachable_cells() 
+            for cell in reachable_cells:                 # if any of the reachable cells match with the king return True
+                if (cell == king.cell).all():       # hier hatte ich nh Fehlermeldung und habs dann ergoogelt
+                    return True 
+        return False
 
     def evaluate(self):
         """
@@ -402,3 +395,153 @@ class Board(BoardBase):
                 
         else:
             return False
+    
+zitrone = Board()
+# print(zitrone)
+
+# test = zitrone.cell_is_valid_and_empty((np.int64(0), np.int64(0)))
+# print(test)
+
+# test2 = zitrone.piece_can_enter_cell(Pawn, (3,4))
+# print(test2)
+
+# wir spielen als weiß, also weiß unten aber die Indizierung ist irgendwie falsch herum
+# PAWNS - WHITE
+bauer = Pawn(zitrone, True)
+# print(bauer)                                       # <pieces.Pawn object at 0x000002030856C1A0>
+pawn_white_1 = zitrone.set_cell((5,1), bauer)        # default(1,0) | test(5,1)
+pawn_white_2 = zitrone.set_cell((1,1), Pawn(zitrone, True))
+pawn_white_3 = zitrone.set_cell((1,2), Pawn(zitrone, True))
+pawn_white_4 = zitrone.set_cell((1,3), Pawn(zitrone, True))
+pawn_white_5 = zitrone.set_cell((1,4), Pawn(zitrone, True))
+pawn_white_6 = zitrone.set_cell((1,5), Pawn(zitrone, True))
+pawn_white_7 = zitrone.set_cell((1,6), Pawn(zitrone, True))
+pawn_white_8 = zitrone.set_cell((1,7), Pawn(zitrone, True))
+
+hilfe = zitrone.get_cell((1,0))
+print(hilfe)
+
+# ROOK - WHITE
+turm = Rook(zitrone, True)
+rook_white_1 = zitrone.set_cell((0,0), turm)
+rook_white_2= zitrone.set_cell((0,7), Rook(zitrone, True))
+
+# KNIGHT - WHITE
+pferd = Knight(zitrone, True)
+knight_white_1 = zitrone.set_cell((0,1), pferd)             # default (0,1) | test(4,3)
+knight_white_2 = zitrone.set_cell((0,6), Knight(zitrone, True))
+# print(type(knight_white_1))
+
+# BISHOP - WHITE
+laufer = Bishop(zitrone, True)
+bishop_white_1 = zitrone.set_cell((0,2), laufer)
+bishop_white_2 = zitrone.set_cell((0,5), Bishop(zitrone, True))
+
+# QUEEN - White
+koenigin = Queen(zitrone, True)
+queen_white = zitrone.set_cell((0,3), koenigin)   # test: 4,3 | default: 0,3
+
+# KING - WHITE
+koenig = King(zitrone, True)
+king_white = zitrone.set_cell((0,4), koenig)   # default(0,4) | test(4,3)
+
+#xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+#xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+#xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+#xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+bauer_schwarz = Pawn(zitrone, False)
+pawn_black_1 = zitrone.set_cell((2,1), bauer_schwarz)        # default(6,0) | test(2,1)
+pawn_black_2 = zitrone.set_cell((6,1), Pawn(zitrone, False))
+pawn_black_3 = zitrone.set_cell((6,2), Pawn(zitrone, False))
+pawn_black_4 = zitrone.set_cell((6,3), Pawn(zitrone, False))
+pawn_black_5 = zitrone.set_cell((6,4), Pawn(zitrone, False))
+pawn_black_6 = zitrone.set_cell((6,5), Pawn(zitrone, False))
+pawn_black_7 = zitrone.set_cell((6,6), Pawn(zitrone, False))
+pawn_black_8 = zitrone.set_cell((6,7), Pawn(zitrone, False))
+
+# ROOK - black
+rook_black_1 = zitrone.set_cell((7,0), Rook(zitrone, False))
+rook_black_2= zitrone.set_cell((7,7), Rook(zitrone, False))
+
+# KNIGHT - black
+knight_black_1 = zitrone.set_cell((7,1), Knight(zitrone, False))  
+knight_black_2 = zitrone.set_cell((7,6), Knight(zitrone, False))
+
+# BISHOP - black
+bishop_black_1 = zitrone.set_cell((7,2), Bishop(zitrone, False)) # default(7,2) | test is king check: 1,3
+bishop_black_2 = zitrone.set_cell((7,5), Bishop(zitrone, False))
+
+# QUEEN - black
+queen_black = zitrone.set_cell((7,3), Queen(zitrone, False))
+
+# KING - black
+king_black = zitrone.set_cell((7,4), King(zitrone, False))
+
+print(zitrone)
+# print(zitrone.get_cell((7,7)))
+
+# test4 = zitrone.piece_can_enter_cell(pawn_white_1, (2,0))
+# print(test4)
+
+# test5 = zitrone.piece_can_hit_on_cell(pawn_white_1, (4,1))
+# print(test5)
+
+# print(zitrone.hash())
+# print(zitrone.save_to_disk("version1_whiteplayer"))
+
+# reachable cells testen ---------------------------------------
+# ehm = bauer.get_reachable_cells()
+# print(f"bauer weiß: {ehm}")
+# ehm2 = bauer_schwarz.get_reachable_cells()
+# print(f"bauer schwarz: {ehm2}")
+# hi = turm.get_reachable_cells()
+# print(f"turm: {hi}")
+# yo = pferd.get_reachable_cells()
+# print(f"springer: {yo}")
+# hä = koenigin.get_reachable_cells()
+# print(f"Königin: {hä}")
+# gah = koenig.get_reachable_cells()
+# print(f"König: {gah}")
+
+# iterate cells with pieces testen -------------------------------
+# diskette = zitrone.iterate_cells_with_pieces(False)
+# print("iterate cells with pieces:")
+# for value in diskette:
+#     print(value)
+
+#find king testen --------------------------------------------------
+# und = zitrone.find_king(True)
+# print(f"König aus find_king: {und}")
+
+#is king check testen -----------------------------------------------
+# maximal = zitrone.is_king_check(True)
+# print(f"Is King check: {maximal}")
+
+what = bauer.cell
+print(f"bauer.cel : {what}")
+# # type is np.array
+# row, col = what
+# print(what)
+# array = np.array([row + 1, col + 1])
+# print(what)
+# print(array)
+
+
+# for row in zitrone.cells:
+#     print(row)
+# OMG HAB ICHS HERAUSGEFUNDEN
+
+# meine ganze Testerei, helfen sie mir
+#  liste = []
+#         # count = 0
+#         # for row in self.board.cells:
+#         #     for cell in row:
+#         #         if cell == 2:
+#         #             self = self.cell
+#         #         else:
+#         #             count += 1
+#         # return type(self.cell)
+#         # # print(count)
+#         row , col = self.cell
+#         liste.append(np.array([row, col]))
+#         return liste
