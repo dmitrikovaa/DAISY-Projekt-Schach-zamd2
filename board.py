@@ -9,6 +9,8 @@ from util import (
     InvalidRowException,
 )
 
+import engine 
+from engine import MinMaxArg
 
 class BoardBase:
     """
@@ -296,6 +298,17 @@ class Board(BoardBase):
         """
         # TODO: Implement
         score = 0.0
+
+        white_pieces = self.iterate_cells_with_pieces(True)
+        for w_piece in white_pieces:
+            w_piece_score = w_piece.evaluate()             # get score of white piece 
+            score += w_piece_score
+
+        black_pieces = self.iterate_cells_with_pieces(not True)
+        for b_piece in black_pieces:
+            b_piece_score = b_piece.evaluate()
+            score -= b_piece_score
+
         return score
 
     def is_valid_cell(self, cell):
@@ -409,7 +422,7 @@ zitrone = Board()
 # PAWNS - WHITE
 bauer = Pawn(zitrone, True)
 # print(bauer)                                       # <pieces.Pawn object at 0x000002030856C1A0>
-pawn_white_1 = zitrone.set_cell((5,1), bauer)        # default(1,0) | test(5,1)
+pawn_white_1 = zitrone.set_cell((1,0), bauer)        # default(1,0) | test(5,1)
 pawn_white_2 = zitrone.set_cell((1,1), Pawn(zitrone, True))
 pawn_white_3 = zitrone.set_cell((1,2), Pawn(zitrone, True))
 pawn_white_4 = zitrone.set_cell((1,3), Pawn(zitrone, True))
@@ -419,7 +432,7 @@ pawn_white_7 = zitrone.set_cell((1,6), Pawn(zitrone, True))
 pawn_white_8 = zitrone.set_cell((1,7), Pawn(zitrone, True))
 
 hilfe = zitrone.get_cell((1,0))
-print(hilfe)
+# print(hilfe)
 
 # ROOK - WHITE
 turm = Rook(zitrone, True)
@@ -450,7 +463,7 @@ king_white = zitrone.set_cell((0,4), koenig)   # default(0,4) | test(4,3)
 #xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 #xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 bauer_schwarz = Pawn(zitrone, False)
-pawn_black_1 = zitrone.set_cell((2,1), bauer_schwarz)        # default(6,0) | test(2,1)
+pawn_black_1 = zitrone.set_cell((6,0), bauer_schwarz)        # default(6,0) | test(2,1)
 pawn_black_2 = zitrone.set_cell((6,1), Pawn(zitrone, False))
 pawn_black_3 = zitrone.set_cell((6,2), Pawn(zitrone, False))
 pawn_black_4 = zitrone.set_cell((6,3), Pawn(zitrone, False))
@@ -477,7 +490,7 @@ queen_black = zitrone.set_cell((7,3), Queen(zitrone, False))
 # KING - black
 king_black = zitrone.set_cell((7,4), King(zitrone, False))
 
-print(zitrone)
+# print(zitrone)
 # print(zitrone.get_cell((7,7)))
 
 # test4 = zitrone.piece_can_enter_cell(pawn_white_1, (2,0))
@@ -489,7 +502,7 @@ print(zitrone)
 # print(zitrone.hash())
 # print(zitrone.save_to_disk("version1_whiteplayer"))
 
-# reachable cells testen ---------------------------------------
+# reachable cells testen -----------------------------------------------
 # ehm = bauer.get_reachable_cells()
 # print(f"bauer weiß: {ehm}")
 # ehm2 = bauer_schwarz.get_reachable_cells()
@@ -503,22 +516,38 @@ print(zitrone)
 # gah = koenig.get_reachable_cells()
 # print(f"König: {gah}")
 
-# iterate cells with pieces testen -------------------------------
+# iterate cells with pieces testen ------------------------------------------
 # diskette = zitrone.iterate_cells_with_pieces(False)
 # print("iterate cells with pieces:")
 # for value in diskette:
 #     print(value)
 
-#find king testen --------------------------------------------------
+#find king testen ----------------------------------------------------------------
 # und = zitrone.find_king(True)
 # print(f"König aus find_king: {und}")
 
-#is king check testen -----------------------------------------------
+#is king check testen ----------------------------------------------------------
 # maximal = zitrone.is_king_check(True)
 # print(f"Is King check: {maximal}")
 
-what = bauer.cell
-print(f"bauer.cel : {what}")
+# testing get valid cells
+# ou = koenig.get_valid_cells()
+# print(ou)
+
+# testing pieces-evaluate -------------------------------------------------
+# lala = bauer.evaluate()
+# print(lala)
+# ge = koenigin.evaluate()
+# print(ge)
+# wh = turm.evaluate()
+# print(wh)
+
+# testing board-evaluate -------------------------------------------------------
+# ma = zitrone.evaluate()
+# print(ma)
+
+# what = bauer.cell
+# print(f"bauer.cel : {what}")
 # # type is np.array
 # row, col = what
 # print(what)
@@ -527,21 +556,41 @@ print(f"bauer.cel : {what}")
 # print(array)
 
 
-# for row in zitrone.cells:
-#     print(row)
-# OMG HAB ICHS HERAUSGEFUNDEN
+# test 17 ausprobieren ------------------------
+zwiebel = Board()
 
-# meine ganze Testerei, helfen sie mir
-#  liste = []
-#         # count = 0
-#         # for row in self.board.cells:
-#         #     for cell in row:
-#         #         if cell == 2:
-#         #             self = self.cell
-#         #         else:
-#         #             count += 1
-#         # return type(self.cell)
-#         # # print(count)
-#         row , col = self.cell
-#         liste.append(np.array([row, col]))
-#         return liste
+wk = King(zwiebel, True)
+white_king = zwiebel.set_cell((7,7), wk)
+wr = Rook(zwiebel, True)
+white_rook = zwiebel.set_cell((3,3), wr)
+
+bp = Pawn(zwiebel, False)
+black_pawn = zwiebel.set_cell((5,3), bp)
+bq = Queen(zwiebel, False)
+black_queen = zwiebel.set_cell((3,5), bq)
+bk = King(zwiebel, False)
+black_king = zwiebel.set_cell((1,3), bk)
+bb = Bishop(zwiebel, False)
+black_bishop = zwiebel.set_cell((3,1), bb)
+
+print(zwiebel)
+
+# gucken ob ich den engine hier aufrufen kann
+engine_evaluate = engine.evaluate_all_possible_moves(zwiebel, MinMaxArg)
+print(engine_evaluate)
+
+l = []
+wa = wk.get_valid_cells()
+for cell in wa:
+    m = zwiebel.get_cell(cell)
+    l.append(m)
+
+# print(l)
+
+# print(wk.evaluate())
+# print(wr.evaluate())
+# print("break")
+# print(bp.evaluate())
+# print(bq.evaluate())
+# print(bk.evaluate())
+# print(bb.evaluate())

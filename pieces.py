@@ -29,7 +29,7 @@ class Piece:
         return self.white
     
     def cell_valid_and_empty(self, cell):
-        return self.board.cell_is_valid_and_empty(cell) # sollte das so ??
+        return self.board.cell_is_valid_and_empty(cell) 
 
     def can_enter_cell(self, cell):
         """
@@ -64,6 +64,118 @@ class Piece:
         :return: Return numerical score between -infinity and +infinity. Greater values indicate better evaluation result (more favorable).
         """
         # TODO: Implement
+        # wenn die Figur andere Figuren schlagen kann, dann wird der Wert von der gegenerischen Figur dazugerechent macht das Sinn
+        # falls gar kein move möglich ist keine punkte außer Figur value hinzufügen 
+
+        pawn_value = 1
+        knight_value = 3 
+        bishop_value = 3
+        rook_value = 5
+        queen_value = 9
+        king_value = 1000
+
+        pawn_hit = 10
+        knight_hit = 30
+        bishop_hit = 30
+        rook_hit = 50
+        queen_hit = 90
+        king_hit = 1000000 # hier ist nh 0 mehr als oben
+
+        # punkte für alle meiner Figuren die noch stehen -> ------------------------------------------------------------------
+        if isinstance(self, Pawn) == True:
+            self.value = pawn_value
+        elif isinstance(self, Knight) == True: 
+            self.value = knight_value
+        elif isinstance(self, Bishop) == True: 
+            self.value = bishop_value
+        elif isinstance(self, Rook) == True:
+            self.value = rook_value
+        elif isinstance(self, Queen) == True:
+            self.value = queen_value
+        elif isinstance(self, King) == True:
+            self.value = king_value
+ 
+        # punkte für hits gegnerischer Figuren -> ---------------------------------------------------------------------
+        # white - pieces ...................................
+        # if self.white == True:
+        valid_cells = self.get_valid_cells()
+        for cell in valid_cells:  # iterate over valid cells for given piece
+            # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            # das ist das Problem :
+            # check which piece was on cell the current piece is on
+            # evaluate the current board config. before placing the piece there 
+            # # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            piece_in_valid_cell = self.board.get_cell(cell)   # get piece thats on the cell 
+            if isinstance(piece_in_valid_cell, Pawn) == True:
+                self.value += pawn_hit    
+            elif isinstance(piece_in_valid_cell, Knight) == True:
+                self.value += knight_hit
+            elif isinstance(piece_in_valid_cell, Bishop) == True:
+                self.value += bishop_hit
+            elif isinstance(piece_in_valid_cell, Rook) == True:
+                self.value += rook_hit
+            elif isinstance(piece_in_valid_cell, Queen) == True:
+                self.value += queen_hit
+            elif isinstance(piece_in_valid_cell, King) == True:
+                self.value += king_hit
+            elif piece_in_valid_cell == None:
+                continue
+
+        # black pieces ....................................
+        # if self.white == False:
+        #     valid_cells = self.get_valid_cells()
+        #     for cell in valid_cells:  # iterate over valid cells for given piece
+        #         piece_in_valid_cell = self.board.get_cell(cell)   # get piece thats on the cell 
+        #         if isinstance(piece_in_valid_cell, Pawn) == True:
+        #             self.value -= pawn_hit    
+        #         elif isinstance(piece_in_valid_cell, Knight) == True:
+        #             self.value -= knight_hit
+        #         elif isinstance(piece_in_valid_cell, Bishop) == True:
+        #             self.value -= bishop_hit
+        #         elif isinstance(piece_in_valid_cell, Rook) == True:
+        #             self.value -= rook_hit
+        #         elif isinstance(piece_in_valid_cell, Queen) == True:
+        #             self.value -= queen_hit
+        #         elif isinstance(piece_in_valid_cell, King) == True:
+        #             self.value -= king_hit
+        #         elif piece_in_valid_cell == None:
+        #             continue
+        
+
+        # Punkteabzug für wenn der eigene König nicht mehr auf dem Feld steht -> --------------------------------------
+        # erster Versuch
+        # count = 0
+        # meine_figuren = []
+        # my_pieces = self.board.iterate_cells_with_pieces(self.white)
+        # for piece in my_pieces:
+        #     meine_figuren.append(piece)
+        # for piece in my_pieces:
+        #     if isinstance(piece, King) == False: 
+        #         count += 1
+        #     else:
+        #         continue
+        # if count == len(meine_figuren):  # count sollte diesselbe länge wie meine figuren haben wenns keinen king mehr gibt
+        #     self.value -= 100000000000
+
+
+        # zweiter Versuch 
+        # current_position = self.cell
+        # opposing_pieces = self.board.iterate_cells_with_pieces(not self.white)
+        # for piece in opposing_pieces:
+        #     if isinstance(piece, King) == True:
+        #         opposing_king_position = piece.cell
+        #         # das klappt net 
+        # if (current_position == opposing_king_position).all():
+        #     self.value += 100000000000
+            
+        # pro Feld was erreichbar ist +10 Punkt -> ---------------------------------------------------------------
+        self.value += (10 * len(valid_cells)) 
+
+        # vllt noch ab reihe 4/5 kommen so 1-2 Punkte drauf für gute Position aufm Brett oder so???
+
+        return self.value
 
     def get_valid_cells(self):
         """
@@ -88,6 +200,30 @@ class Piece:
         :return: Return True 
         """
         # TODO: Implement
+        valid_cells = []
+        reachable_cells = self.get_reachable_cells()
+        for zelle in reachable_cells:
+            old_position = self.cell
+            piece_on_cell_i_want_to_move_to = self.board.get_cell(zelle)  # could also be None
+            self.board.set_cell(zelle, self)    # das piece was wir uns angucken auf die erste Zelle gestellt die wir ausprobieren
+            if self.board.is_king_check_cached(self.white) == False:
+                if isinstance(self.cell, King) == True: # King bewegt sich nicht solange er nicht im Schach steht !!!!
+                    continue
+                else:
+                    valid_cells.append(zelle)
+            else:
+                continue   # das steht hier weil hiermit Rook bei meinen evaluated moves an erster Stelle steht 
+            # aber so genau versteh ich das nicht?
+            # heißt das die schleife läuft ohne das nicht weiter oder wie oder was
+            
+            # restore original config.  # set.cell sets cell thats left behind to None
+            self.board.set_cell(old_position, self)          
+            if piece_on_cell_i_want_to_move_to != None:
+                self.board.set_cell(zelle, piece_on_cell_i_want_to_move_to)
+
+            
+        
+        return valid_cells
 
 class Pawn(Piece):  # Bauer
     def __init__(self, board, white):
