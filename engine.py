@@ -241,9 +241,11 @@ def minMax(board, minMaxArg):
     # TODO: Implement the Mini-Max algorithm
     minMaxArg = MinMaxArg()
     top_evaluated_moves = board.evaluate_all_possible_moves(minMaxArg)
-    while minMaxArg.depth > 1:
-        pass
-    
+
+    # create a function for "key" parameter in sorting algorithm
+    def get_score(move):    
+            return move.score
+
     # special case: there are no more moves left, meaning the current color lost -> -------------------------------------------
     if top_evaluated_moves == []:
         # if white == True -> very minusy score
@@ -252,6 +254,34 @@ def minMax(board, minMaxArg):
             top_evaluated_moves.append(Move(0, (0,0), -10000000000)) # whats in here shouldnt matter bis auf den score halt
         elif minMaxArg.playAsWhite == False:
             top_evaluated_moves.append(Move(0, (0,0), 10000000000))
+
+    while minMaxArg.depth > 1:
+        for possible_move in top_evaluated_moves:
+            starting_position = possible_move.piece.cell  # position of the piece itself in the object Move !!
+            piece_on_cell_i_wanna_move_onto = board.get_cell(possible_move.cell)
+            board.set_cell(possible_move.cell, possible_move.piece) # position of the angegeben cell in the object Move !!
+
+            # call minMax_cached with the next minMaxArg (also minMax_next), was auch immer das jetzt heißen soll
+            next_arg = minMaxArg.next()
+            recursive_score_result = minMax_cached(board, next_arg)
+            # ist das so richtig manno
+
+            # overwrite current moves score with the one from the recursive call
+            possible_move.score = recursive_score_result 
+
+            # restore original board config. -> 
+            board.set_cell(starting_position, possible_move.piece)
+            if piece_on_cell_i_wanna_move_onto != None:
+                board.set_cell(possible_move.cell, piece_on_cell_i_wanna_move_onto)
+
+    if minMaxArg.playAsWhite == True:
+        top_evaluated_moves.sort(reverse=True, key=get_score)
+    elif minMaxArg.playAsWhite == False:
+        top_evaluated_moves.sort(key=get_score)
+
+    
+    if minMaxArg.depth == 1:
+        return top_evaluated_moves
 
 
 def suggest_random_move(board):

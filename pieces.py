@@ -72,7 +72,7 @@ class Piece:
         bishop_value = 3
         rook_value = 5
         queen_value = 9
-        king_value = 1000
+        king_value = 100000
 
         pawn_hit = 10
         knight_hit = 30
@@ -144,7 +144,8 @@ class Piece:
         #             continue
         
 
-        # Punkteabzug für wenn der eigene König nicht mehr auf dem Feld steht -> --------------------------------------
+        # Punkteabzug für wenn der eigene König nicht mehr auf dem Feld steht -> ---------------
+        # Moment vllt muss das doch nicht, weil bei minmax wird das schon geregelt (special case: no more moves left)
         # erster Versuch
         # count = 0
         # meine_figuren = []
@@ -207,6 +208,7 @@ class Piece:
             piece_on_cell_i_want_to_move_to = self.board.get_cell(zelle)  # could also be None
             self.board.set_cell(zelle, self)    # das piece was wir uns angucken auf die erste Zelle gestellt die wir ausprobieren
             if self.board.is_king_check_cached(self.white) == False:
+                # macht das hier überhaupt Sinn, bitte erlösen sie mich
                 if isinstance(self.cell, King) == True: # King bewegt sich nicht solange er nicht im Schach steht !!!!
                     continue
                 else:
