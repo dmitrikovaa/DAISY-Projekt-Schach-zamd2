@@ -94,82 +94,48 @@ def evaluate_all_possible_moves(board, minMaxArg, maximumNumberOfMoves = 10):
     more moves possible (in most situations there are), only return the top (or worst). Hint: Slice the list after sorting. 
     """
     # TODO: Implement the method according to the above description
-    def get_score(move):    # create a function for "key" parameter in sorting algorithm
+    def get_score(move):   
             return move.score
-    # key function wirkt direkt auf die elemente in der Liste und nicht die liste selbst, man muss nichts in klammern dahinter angeben weil das fest auf die elemente der liste angewandt wird
     
     minMaxArg = MinMaxArg()
-    # the higher the score the better for white !!!!
-    # WHITE PIECES --------------------------------- alles fängt mit Großbuchstaben an !
-    if minMaxArg.playAsWhite == True:
-        Evaluated_moves = []
-        liste_to_see = []
-        white_pieces = board.iterate_cells_with_pieces(minMaxArg.playAsWhite) # get all white pieces on given board 
-        for w_piece in white_pieces:
-            Valid_moves = w_piece.get_valid_cells()
-            for Zelle in Valid_moves:   
-                Start_position = w_piece.cell           # remember Ausgangsposition of piece we are looking at 
-                Piece_on_cell_i_want_to_move_onto = board.get_cell(Zelle)
-                Move_to_be_evaluated = board.set_cell(Zelle, w_piece)      # set piece we're looking at on cell we wanna test
-                Score_of_current_board_config = board.evaluate()
+ 
+    playing_as_white = minMaxArg.playAsWhite
+    evaluated_moves = []
+    liste_to_see = []
+    my_pieces = board.iterate_cells_with_pieces(playing_as_white) 
 
-                # store the move in list of evaluated moves as object of class Move -> ---------------------------------------------------
-                Move_to_be_evaluated = Move(w_piece, Zelle, Score_of_current_board_config) 
-                Evaluated_moves.append(Move_to_be_evaluated) # save it as object of class Move, that way it contains all the info i need
+    for piece in my_pieces:
+        valid_moves = piece.get_valid_cells()
 
-                # restore original board config. -> -----------------------------------------------
-                board.set_cell(Start_position, w_piece)
-                if Piece_on_cell_i_want_to_move_onto != None:
-                    board.set_cell(Zelle, Piece_on_cell_i_want_to_move_onto)
+        for zelle in valid_moves:   
+            start_position = piece.cell           
+            captured_piece = board.get_cell(zelle)
+            Move_to_be_evaluated = board.set_cell(zelle, piece)      
+            score = board.evaluate()
 
-        # sorting the list of evaluated moves-> --------------------------------------------------
-        Evaluated_moves.sort(reverse=True, key=get_score) # !!!!!!! wenn ich das reverse wegmache habe ich 1 Fehlermeldung weniger....
-        # list has to be sorted descending (best move on 0) thats why we sort it reversed
+            # store the move in list of evaluated moves as object of class Move -> ---------------------------------------------------
+            Move_to_be_evaluated = Move(piece, zelle, score) 
+            evaluated_moves.append(Move_to_be_evaluated) 
 
-        #testing the sort algo ------------------------- *
-        for move in Evaluated_moves:
-            liste_to_see.append(move.piece)
-            liste_to_see.append(move.cell)
-            liste_to_see.append(move.score)
-            liste_to_see.append("|breakpoint|")
+            # restore original board config. -> -----------------------------------------------
+            board.set_cell(start_position, piece)
+            if captured_piece != None:
+                board.set_cell(zelle, captured_piece)
 
-        # return only the maximum number of moves-> -----------------------------------------
-        if len(Evaluated_moves) > maximumNumberOfMoves:
-            return liste_to_see, Evaluated_moves[:10]  # * liste_to_see,
+    # sorting the list of evaluated moves-> --------------------------------------------------
+    if playing_as_white == True:
+        evaluated_moves.sort(reverse=True, key=get_score) 
+    if playing_as_white == False:
+        evaluated_moves.sort(key=get_score)
 
-        return Evaluated_moves
-
-    # BLACK PIECES -------------------------------- hier mit Kleinbuchstaben !
-    if minMaxArg.playAsWhite == False:
-        evaluated_moves = []
-        black_pieces = board.iterate_cells_with_pieces(minMaxArg.playAsWhite)  # ich hatte hier vorher "not" stehen weil True ja bei playaswhite vorgegeben ist grad aber vllt ändert sich das ja noch?
-        for b_piece in black_pieces:
-            valid_moves = b_piece.get_valid_cells()
-            for zelle in valid_moves:
-                start_position = b_piece.cell
-                piece_on_cell_i_want_to_move_onto = board.get_cell(zelle)
-                move_to_be_evaluated = board.set_cell(zelle, b_piece)
-                score_of_current_board_config = board.evaluate()
-
-                # store the move in a list as object of class Move -> ---------------------------
-                move_to_be_evaluated = Move(b_piece, zelle, score_of_current_board_config)
-                evaluated_moves.append(move_to_be_evaluated)
-
-                # restore original board config. -> --------------------------------
-                board.set_cell(start_position, b_piece)
-                if piece_on_cell_i_want_to_move_onto != None:
-                    board.set_cell(zelle, piece_on_cell_i_want_to_move_onto)
-
-        # sorting list of evaluated moves-> -------------------------------------
-        evaluated_moves.sort(key=get_score) 
-        # because evaluating the board config gives us the score favorable to white we need he worst moves for white to get the best ones for black 
-        # -> thats why ascending sort (worst move on 0)
-
-        # return only maximum number of moves-> ---------------------------------
-        if len(evaluated_moves) > maximumNumberOfMoves:
-            return evaluated_moves[:10]
-            
-        return evaluated_moves
+    # testing the sort algo ------------------------- *
+    for move in evaluated_moves:
+        # liste_to_see.append(move.piece)
+        # liste_to_see.append(move.cell)
+        liste_to_see.append(move.score)
+        # liste_to_see.append("|breakpoint|")
+        
+    return evaluated_moves[:maximumNumberOfMoves]#, liste_to_see
 
 
 def minMax(board, minMaxArg):
@@ -240,49 +206,50 @@ def minMax(board, minMaxArg):
     """
     # TODO: Implement the Mini-Max algorithm
     minMaxArg = MinMaxArg()
-    top_evaluated_moves = board.evaluate_all_possible_moves(minMaxArg)
 
-    # create a function for "key" parameter in sorting algorithm
     def get_score(move):    
             return move.score
 
-    # special case: there are no more moves left, meaning the current color lost -> -------------------------------------------
-    if top_evaluated_moves == []:
-        # if white == True -> very minusy score
-        # if white == False -> very high score
-        if minMaxArg.playAsWhite == True:
-            top_evaluated_moves.append(Move(0, (0,0), -10000000000)) # whats in here shouldnt matter bis auf den score halt
-        elif minMaxArg.playAsWhite == False:
-            top_evaluated_moves.append(Move(0, (0,0), 10000000000))
+    test = []
 
     while minMaxArg.depth > 1:
-        for possible_move in top_evaluated_moves:
-            starting_position = possible_move.piece.cell  # position of the piece itself in the object Move !!
-            piece_on_cell_i_wanna_move_onto = board.get_cell(possible_move.cell)
-            board.set_cell(possible_move.cell, possible_move.piece) # position of the angegeben cell in the object Move !!
+        top_moves = evaluate_all_possible_moves(board, minMaxArg)
 
-            # call minMax_cached with the next minMaxArg (also minMax_next), was auch immer das jetzt heißen soll
+        for move in top_moves:
+            starting_position = move.piece.cell  
+            captured_piece = board.get_cell(move.cell)
+            board.set_cell(move.cell, move.piece) 
+
             next_arg = minMaxArg.next()
             recursive_score_result = minMax_cached(board, next_arg)
-            # ist das so richtig manno
-
+        
             # overwrite current moves score with the one from the recursive call
-            possible_move.score = recursive_score_result 
+            move.score = recursive_score_result 
 
             # restore original board config. -> 
-            board.set_cell(starting_position, possible_move.piece)
-            if piece_on_cell_i_wanna_move_onto != None:
-                board.set_cell(possible_move.cell, piece_on_cell_i_wanna_move_onto)
+            board.set_cell(starting_position, move.piece)
+            if captured_piece != None:
+                board.set_cell(move.cell, captured_piece)
+    
+    # special case: there are no more moves left, meaning the current color lost -> -------------------------------------------
+    if top_moves == []:
+
+        if minMaxArg.playAsWhite == True:
+            top_moves.append(Move(0, (0,0), -1000)) 
+        elif minMaxArg.playAsWhite == False:
+            top_moves.append(Move(0, (0,0), 1000))
+
 
     if minMaxArg.playAsWhite == True:
-        top_evaluated_moves.sort(reverse=True, key=get_score)
+        top_moves.sort(reverse=True, key=get_score)
     elif minMaxArg.playAsWhite == False:
-        top_evaluated_moves.sort(key=get_score)
+        top_moves.sort(key=get_score)
 
     
     if minMaxArg.depth == 1:
-        return top_evaluated_moves
+        return top_moves[0]
 
+# recursion error
 
 def suggest_random_move(board):
     """
@@ -298,6 +265,20 @@ def suggest_random_move(board):
     If there are no legal moves at all, return None.
     """
     # TODO: Implement a valid random move
+
+    white_pieces = board.iterate_cells_with_pieces(True)
+    for piece in white_pieces:
+        valid_pieces = []
+
+        if piece.get_valid_cells != []:
+            valid_pieces.append(piece)
+
+    random_piece = random.choice(valid_pieces)
+    target_cell = random.choice(random_piece.get_valid_cells)
+
+    
+
+    return Move() # hier muss noch was in die Klammer 
 
 
 
