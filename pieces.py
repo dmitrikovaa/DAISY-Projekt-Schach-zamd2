@@ -87,31 +87,7 @@ class Piece:
             value = queen_value
         elif isinstance(self, King):
             value = king_value
- 
-
-        pawn_hit = 0.1
-        knight_hit = 0.3
-        bishop_hit = 0.3
-        rook_hit = 0.5
-        queen_hit = 0.9
-        king_hit = 10
-
-        # punkte für mögliche(!) hits gegnerischer Figuren -> ---------------------------------------------------------------------
-        # valid_cells = self.get_valid_cells()
-        # for cell in valid_cells: 
-        #     piece_in_valid_cell = self.board.get_cell(cell)   
-        #     if isinstance(piece_in_valid_cell, Pawn):
-        #         value += pawn_hit    
-        #     elif isinstance(piece_in_valid_cell, Knight):
-        #         value += knight_hit
-        #     elif isinstance(piece_in_valid_cell, Bishop):
-        #         value += bishop_hit
-        #     elif isinstance(piece_in_valid_cell, Rook):
-        #         value += rook_hit
-        #     elif isinstance(piece_in_valid_cell, Queen):
-        #         value += queen_hit
-        #     elif isinstance(piece_in_valid_cell, King):
-        #         value += king_hit
+            
 
         return value
 

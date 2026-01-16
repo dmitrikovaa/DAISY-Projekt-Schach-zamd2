@@ -94,11 +94,7 @@ def evaluate_all_possible_moves(board, minMaxArg, maximumNumberOfMoves = 10):
     more moves possible (in most situations there are), only return the top (or worst). Hint: Slice the list after sorting. 
     """
     # TODO: Implement the method according to the above description
-    def get_score(move):   
-            return move.score
     
-    minMaxArg = MinMaxArg()
- 
     playing_as_white = minMaxArg.playAsWhite
     evaluated_moves = []
     liste_to_see = []
@@ -124,9 +120,9 @@ def evaluate_all_possible_moves(board, minMaxArg, maximumNumberOfMoves = 10):
 
     # sorting the list of evaluated moves-> --------------------------------------------------
     if playing_as_white == True:
-        evaluated_moves.sort(reverse=True, key=get_score) 
+        evaluated_moves.sort(reverse=True, key=lambda move: move.score) 
     if playing_as_white == False:
-        evaluated_moves.sort(key=get_score)
+        evaluated_moves.sort(key=lambda move: move.score)
 
     # testing the sort algo ------------------------- *
     for move in evaluated_moves:
@@ -205,49 +201,49 @@ def minMax(board, minMaxArg):
     :rtype: :py:class:`Move`
     """
     # TODO: Implement the Mini-Max algorithm
-    minMaxArg = MinMaxArg()
+    # minMaxArg = MinMaxArg()
 
-    def get_score(move):    
-            return move.score
+    # def get_score(move):    
+    #         return move.score
 
-    test = []
+    # test = []
 
-    while minMaxArg.depth > 1:
-        top_moves = evaluate_all_possible_moves(board, minMaxArg)
+    # while minMaxArg.depth > 1:
+    #     top_moves = evaluate_all_possible_moves(board, minMaxArg)
 
-        for move in top_moves:
-            starting_position = move.piece.cell  
-            captured_piece = board.get_cell(move.cell)
-            board.set_cell(move.cell, move.piece) 
+    #     for move in top_moves:
+    #         starting_position = move.piece.cell  
+    #         captured_piece = board.get_cell(move.cell)
+    #         board.set_cell(move.cell, move.piece) 
 
-            next_arg = minMaxArg.next()
-            recursive_score_result = minMax_cached(board, next_arg)
+    #         next_arg = minMaxArg.next()
+    #         recursive_score_result = minMax_cached(board, next_arg)
         
-            # overwrite current moves score with the one from the recursive call
-            move.score = recursive_score_result 
+    #         # overwrite current moves score with the one from the recursive call
+    #         move.score = recursive_score_result 
 
-            # restore original board config. -> 
-            board.set_cell(starting_position, move.piece)
-            if captured_piece != None:
-                board.set_cell(move.cell, captured_piece)
+    #         # restore original board config. -> 
+    #         board.set_cell(starting_position, move.piece)
+    #         if captured_piece != None:
+    #             board.set_cell(move.cell, captured_piece)
     
-    # special case: there are no more moves left, meaning the current color lost -> -------------------------------------------
-    if top_moves == []:
+    # # special case: there are no more moves left, meaning the current color lost -> -------------------------------------------
+    # if top_moves == []:
 
-        if minMaxArg.playAsWhite == True:
-            top_moves.append(Move(0, (0,0), -1000)) 
-        elif minMaxArg.playAsWhite == False:
-            top_moves.append(Move(0, (0,0), 1000))
+    #     if minMaxArg.playAsWhite == True:
+    #         top_moves.append(Move(0, (0,0), -1000)) 
+    #     elif minMaxArg.playAsWhite == False:
+    #         top_moves.append(Move(0, (0,0), 1000))
 
 
-    if minMaxArg.playAsWhite == True:
-        top_moves.sort(reverse=True, key=get_score)
-    elif minMaxArg.playAsWhite == False:
-        top_moves.sort(key=get_score)
+    # if minMaxArg.playAsWhite == True:
+    #     top_moves.sort(reverse=True, key=lambda move: move.score)
+    # elif minMaxArg.playAsWhite == False:
+    #     top_moves.sort(key=lambda move: move.score)
 
     
-    if minMaxArg.depth == 1:
-        return top_moves[0]
+    # if minMaxArg.depth == 1:
+    #     return top_moves[0]
 
 # recursion error
 

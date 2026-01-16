@@ -439,6 +439,10 @@ class Board(BoardBase):
         else:
             return False
     
+
+
+
+
 # zitrone = Board()
 # print(zitrone)
 
@@ -587,21 +591,21 @@ class Board(BoardBase):
 
 
 # test 17 ausprobieren ------------------------
-zwiebel = Board()
+# zwiebel = Board()
 
-wk = King(zwiebel, True)
-white_king = zwiebel.set_cell((7,7), wk)
-wr = Rook(zwiebel, True)
-white_rook = zwiebel.set_cell((3,3), wr)
+# wk = King(zwiebel, True)
+# white_king = zwiebel.set_cell((7,7), wk)
+# wr = Rook(zwiebel, True)
+# white_rook = zwiebel.set_cell((3,3), wr)
 
-bp = Pawn(zwiebel, False)
-black_pawn = zwiebel.set_cell((5,3), bp)
-bq = Queen(zwiebel, False)
-black_queen = zwiebel.set_cell((3,5), bq)
-bk = King(zwiebel, False)
-black_king = zwiebel.set_cell((1,3), bk)
-bb = Bishop(zwiebel, False)
-black_bishop = zwiebel.set_cell((3,1), bb)
+# bp = Pawn(zwiebel, False)
+# black_pawn = zwiebel.set_cell((5,3), bp)
+# bq = Queen(zwiebel, False)
+# black_queen = zwiebel.set_cell((3,5), bq)
+# bk = King(zwiebel, False)
+# black_king = zwiebel.set_cell((1,3), bk)
+# bb = Bishop(zwiebel, False)
+# black_bishop = zwiebel.set_cell((3,1), bb)
 
 # das selbe aber für schwarz
 # bk= King(zwiebel, False)
@@ -619,14 +623,14 @@ black_bishop = zwiebel.set_cell((3,1), bb)
 # white_bishop = zwiebel.set_cell((3,1), wb)
 
 
-print(zwiebel)
+# print(zwiebel)
 # print(zwiebel.evaluate())
 
 # gucken ob ich den engine hier aufrufen kann
-engine_evaluate = engine.evaluate_all_possible_moves(zwiebel, MinMaxArg)
+# engine_evaluate = engine.evaluate_all_possible_moves(zwiebel, MinMaxArg)
 # print(engine_evaluate)
 
-minmax_test = engine.minMax(zwiebel, MinMaxArg)
+# minmax_test = engine.minMax(zwiebel, MinMaxArg)
 # print(minmax_test)
 
 
