@@ -201,7 +201,7 @@ def minMax(board, minMaxArg):
     :rtype: :py:class:`Move`
     """
     # TODO: Implement the Mini-Max algorithm
-    #minMaxArg = MinMaxArg()
+    minMaxArg = MinMaxArg()
 
     def get_score(move):    
             return move.score
@@ -248,6 +248,53 @@ def minMax(board, minMaxArg):
     return top_moves[0] #immer top move ausgeben
 
 # recursion error
+
+    # # minmaxArg gibt infos über Tiefe (depth) und Farbe also weiss&schwarz
+    # top_moves = evaluate_all_possible_moves(board, minMaxArg)
+    # # liste von move objekten zb  
+    
+    # if top_moves == []: # wenn liste leer 
+    #     if minMaxArg.playAsWhite: # spiel vorbei weiss loser ( take the L )
+    #         return Move (None, None, -1000)
+    #     else: 
+    #         return Move (None,None, 1000) # schwarz loser
+    
+    
+    # if minMaxArg.depth == 1: # wenn genau 1
+    #     return top_moves [0] # dann stopp! nimm den erste element der liste broski
+    
+    # # > 1
+    # for move in top_moves:
+    # # für jeden einzelnen move in meinen möglichen zügen schaue ich an    
+    #     start_cell = move.piece.cell # speichert wo sie vorher war 
+    #     captured_piece = board.get_cell(move.cell) # das was auf dem zeilfeld steht etc
+        
+        
+    #     board.set_cell(move.cell, move.piece) # zug wird ausgeführt als test (nicht irl)
+        
+    #     next_arg = minMaxArg.next() # packt den gegnerische antwort da rein und macht depth -1, spielerwchsel
+        
+    #     response_move = minMax_cached(board, next_arg)
+    #     # bester zug des gegners = minmax_cached -> das ruft minmax auf und schaut halt bis depth ==1 so rein um zu checken
+    #     # was der beste zug ist 
+    #     # board ist eben unser jeztiges brett und next_arg ist  
+        
+    #     move.score = response_move.score # score wird überschrieben
+        
+    #     board.set_cell(start_cell, move.piece) # board wird zurückgesetzt 
+        
+    #     if captured_piece is not None:
+    #         board.set_cell(move.cell, captured_piece)       
+    
+    # # das sortiert unsere werte 
+    # if minMaxArg.playAsWhite: # weiss ist groß nach klein
+    #     top_moves.sort( reverse=True, key=lambda m: m.score) 
+        
+    # else: # und schwarz ist klein nach groß also nicht reverse
+    #     top_moves.sort(key=lambda m: m.score) 
+        
+    # return top_moves[0] # am ende returnen wir unseren top move 
+        
 
 def suggest_random_move(board):
     """
