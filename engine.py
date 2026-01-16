@@ -201,49 +201,51 @@ def minMax(board, minMaxArg):
     :rtype: :py:class:`Move`
     """
     # TODO: Implement the Mini-Max algorithm
-    # minMaxArg = MinMaxArg()
+    #minMaxArg = MinMaxArg()
 
-    # def get_score(move):    
-    #         return move.score
+    def get_score(move):    
+            return move.score
 
-    # test = []
+    test = []
 
-    # while minMaxArg.depth > 1:
-    #     top_moves = evaluate_all_possible_moves(board, minMaxArg)
+    top_moves = evaluate_all_possible_moves(board, minMaxArg) #nach außen für wenn == 1
 
-    #     for move in top_moves:
-    #         starting_position = move.piece.cell  
-    #         captured_piece = board.get_cell(move.cell)
-    #         board.set_cell(move.cell, move.piece) 
+    if minMaxArg.depth > 1:
 
-    #         next_arg = minMaxArg.next()
-    #         recursive_score_result = minMax_cached(board, next_arg)
+        for move in top_moves:
+            starting_position = move.piece.cell  
+            captured_piece = board.get_cell(move.cell)
+
+            board.set_cell(starting_position, None) # Altes Feld leeren
+            board.set_cell(move.cell, move.piece) 
+            starting_position = move.cell ## der Figur mitteilen, wo sie jetzt ist
+
+            recursive_score_result = minMax_cached(board, minMaxArg.next())
         
-    #         # overwrite current moves score with the one from the recursive call
-    #         move.score = recursive_score_result 
+            # overwrite current moves score with the one from the recursive call
+            move.score = recursive_score_result.score #+ .score
 
-    #         # restore original board config. -> 
-    #         board.set_cell(starting_position, move.piece)
-    #         if captured_piece != None:
-    #             board.set_cell(move.cell, captured_piece)
+            # restore original board config. -> 
+            board.set_cell(starting_position, move.piece)
+            board.set_cell(move.cell, captured_piece)
+            move.piece.cell = starting_position
+            # if captured_piece != None:
+            #     board.set_cell(move.cell, captured_piece)
     
-    # # special case: there are no more moves left, meaning the current color lost -> -------------------------------------------
-    # if top_moves == []:
+    # special case: there are no more moves left, meaning the current color lost -> -------------------------------------------
+    if len(top_moves) == 0:
 
-    #     if minMaxArg.playAsWhite == True:
-    #         top_moves.append(Move(0, (0,0), -1000)) 
-    #     elif minMaxArg.playAsWhite == False:
-    #         top_moves.append(Move(0, (0,0), 1000))
+        if minMaxArg.playAsWhite == True:
+            top_moves.append(Move(None, (0,0), -10000)) 
+        elif minMaxArg.playAsWhite == False:
+            top_moves.append(Move(None, (0,0), 10000))
 
 
-    # if minMaxArg.playAsWhite == True:
-    #     top_moves.sort(reverse=True, key=lambda move: move.score)
-    # elif minMaxArg.playAsWhite == False:
-    #     top_moves.sort(key=lambda move: move.score)
+    top_moves.sort(reverse=minMaxArg.playAsWhite, key=lambda move: move.score)
+
 
     
-    # if minMaxArg.depth == 1:
-    #     return top_moves[0]
+    return top_moves[0] #immer top move ausgeben
 
 # recursion error
 
@@ -262,19 +264,21 @@ def suggest_random_move(board):
     """
     # TODO: Implement a valid random move
 
-    white_pieces = board.iterate_cells_with_pieces(True)
-    for piece in white_pieces:
-        valid_pieces = []
-
-        if piece.get_valid_cells != []:
+    pieces = board.iterate_cells_with_pieces(True)
+    valid_pieces = []
+    for piece in pieces:
+        moves = piece.get_valid_cells()
+        if len(moves) > 0:
             valid_pieces.append(piece)
+    
+    if len(valid_pieces) == 0:
+        return None
 
     random_piece = random.choice(valid_pieces)
-    target_cell = random.choice(random_piece.get_valid_cells)
-
+    target_cell = random.choice(random_piece.get_valid_cells())
+    the_score = random_piece.evaluate()
     
-
-    return Move() # hier muss noch was in die Klammer 
+    return Move(random_piece, target_cell, the_score)
 
 
 

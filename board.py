@@ -124,7 +124,7 @@ class BoardBase:
         Calls is_king_check for board configurations not yet known. Caches the result for later look-up.
         """
         # Calculate hash and see if current position is in the cache
-        hash = self.hash() + "-w" if white else "-b"
+        hash = self.hash() + ("-w" if white else "-b")
         if hash in self.check_cache:
             return self.check_cache[hash]
 
@@ -630,7 +630,7 @@ class Board(BoardBase):
 # engine_evaluate = engine.evaluate_all_possible_moves(zwiebel, MinMaxArg)
 # print(engine_evaluate)
 
-# minmax_test = engine.minMax(zwiebel, MinMaxArg)
+# minmax_test = engine.minMax(zwiebel, minMaxArg = MinMaxArg())
 # print(minmax_test)
 
 
